@@ -1,12 +1,16 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNotifications } from "../hooks/useNotifications";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // null means not logged in
   const [loading, setLoading] = useState(false); // Authentication loading state
+
+  // Push notifications — auto-registers device token whenever user is set
+  const { expoPushToken, notification } = useNotifications(user?.id ?? null);
 
   const [dashboardData, setDashboardData] = useState({
     postureScore: 0,
@@ -115,6 +119,8 @@ export const UserProvider = ({ children }) => {
         login,
         logout,
         fetchDashboardData,
+        expoPushToken,      // exposed for debugging
+        lastNotification: notification,
       }}
     >
       {children}
